@@ -1,10 +1,9 @@
 
 // import React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.scss';
-import ColorBox from './components/ColorBox';
-import TodoList from './components/TodoList';
-import TodoForm from './components/TodoForm';
+
+import PostList from './components/PostList';
 
 function App() {
   const [todoList, setTodoList] = useState([
@@ -12,6 +11,31 @@ function App() {
     { id: 2, title: 'We love Easy Frontend! �� ' },
     { id: 3, title: 'They love Easy Frontend! �� ' },
   ]);
+
+  const [postList, setPostList] = useState([]);
+
+  useEffect(() => {
+    async function fetchPostList() {
+      try {
+        const requestUrl = 'http://js-post-api.herokuapp.com/api/posts?_limit=10&_page=1';
+        const response = await fetch(requestUrl);
+        const responseJSON = await response.json();
+        console.log({ responseJSON });
+
+        const { data } = responseJSON;
+        setPostList(data);
+      } catch (error) {
+        console.log('Failed: ', error.message);
+      }
+
+    }
+    console.log('asfsdgdshgfdh');
+    fetchPostList();
+  }, []);
+
+  useEffect(() => {
+    console.log('Nguen Yuan Anh');
+  });
 
   function handleTodoClick(todo) {
     console.log(todo);
@@ -37,12 +61,8 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Nguyen Tuan Anh</h1>
-      <TodoForm onSubmit={handleTodoFormSubmit} />
-      <TodoList todos={todoList} onTodoClick={handleTodoClick} />
-
-      <br />
-      <ColorBox />
+      <h1>NTA - Call API</h1>
+      <PostList posts={postList} />
     </div>
   );
 }
