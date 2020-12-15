@@ -14,7 +14,7 @@ function PostList(props) {
     return (
         <ul className="post-list">
             {posts.map(post => (
-                <li key={post.id}>{post.author}</li>
+                <li key={post.id}>{post.title}</li>
             ))}
         </ul>
     );
