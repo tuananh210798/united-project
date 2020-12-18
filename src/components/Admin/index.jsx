@@ -19,14 +19,27 @@ function Admin(props) {
         marginLeft: '11px',
         marginBottom: '10px'
     };
+
     const [bookList, setBookList] = useState([]);
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
     const [pageSize, setPageSize] = useState(5);
+    const [searchTitle, setSearchTitle] = useState("");
 
     const pageSizes = [5, 15, 25];
-    const getRequestParams = (page, pageSize) => {
+
+    const onChangeSearchTitle = (e) => {
+        setSearchTitle(e.target.value);
+        console.log(searchTitle);
+    };
+
+    const getRequestParams = (searchTitle, page, pageSize) => {
         let params = {};
+
+
+        if (searchTitle) {
+            params["search"] = searchTitle;
+        }
         if (page) {
             params["page"] = page;
         }
@@ -36,25 +49,28 @@ function Admin(props) {
         }
         return params;
     };
-
-    useEffect(() => {
-        const fetchBookList = async () => {
-            try {
-                const params = getRequestParams(page, pageSize);
-                console.log(params);
-                await productAPI.getAll(params)
-                    .then((response) => {
-                        const bk = response;
-                        let tt = localStorage.getItem("tt");
-                        setCount(Math.ceil(tt / pageSize));
-                        setBookList(bk);
-                    })
-            } catch (error) {
-                console.log('Failed to fetch product list:', error)
-            }
+    const fetchBookList = async () => {
+        try {
+            const params = getRequestParams(searchTitle, page, pageSize);
+            console.log(params);
+            await productAPI.getAll(params)
+                .then((response) => {
+                    const bk = response;
+                    let tt = localStorage.getItem("tt");
+                    setCount(Math.ceil(tt / pageSize));
+                    setBookList(bk);
+                })
+        } catch (error) {
+            console.log('Failed to fetch product list:', error)
         }
-        fetchBookList();
-    }, [page, pageSize]);
+    }
+
+    useEffect(
+
+        fetchBookList
+        , [searchTitle, page, pageSize]);
+
+
 
     useEffect(() => {
         const fetchBookList2 = async () => {
@@ -93,15 +109,6 @@ function Admin(props) {
             <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
                 <a className="navbar-brand" href="index.html">Start Bootstrap</a>
                 <button className="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i className="fas fa-bars"></i></button>
-                {/* Navbar Search */}
-                <form className="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-                    <div className="input-group">
-                        <input className="form-control" type="text" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
-                        <div className="input-group-append">
-                            <button className="btn btn-primary" type="button"><i className="fas fa-search"></i></button>
-                        </div>
-                    </div>
-                </form>
                 {/* <!-- Navbar--> */}
                 <ul className="navbar-nav ml-auto ml-md-0">
                     <li className="nav-item dropdown">
@@ -254,7 +261,15 @@ function Admin(props) {
                                                     </option>
                                                 ))}
                                             </select>
-
+                                            <form className="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+                                                <div className="input-group">
+                                                    <input style={{ marginLeft: "650px" }} value={searchTitle}
+                                                        onChange={onChangeSearchTitle} className="form-control" type="text" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
+                                                    <div className="input-group-append">
+                                                        <button className="btn btn-primary" type="button"><i className="fas fa-search"></i></button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                             <table className="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                                 <thead>
                                                     <tr>
