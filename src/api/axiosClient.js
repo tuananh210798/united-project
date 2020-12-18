@@ -7,7 +7,7 @@ import queryString from 'query-string';
 // config` for the full list of configs
 
 const axiosClient = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
+    baseURL: 'https://5fd8735d7e05f000170d28dc.mockapi.io/api',
     headers: {
         'content-type': 'application/json',
     },

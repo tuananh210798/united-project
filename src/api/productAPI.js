@@ -6,9 +6,7 @@ const productAPI = {
         const url = '/products';
         return axiosClient.get(url, {
             params,
-            headers: {
-                'ta': 'dz'
-            }
+
         });
     },
     get: (id) => {
@@ -16,6 +14,11 @@ const productAPI = {
         return axiosClient.get(url);
     },
 
+
+    getBook: (paramsString) => {
+        const url = `/products/${paramsString}`;
+        return axiosClient.get(url);
+    },
 }
 
 export default productAPI;
