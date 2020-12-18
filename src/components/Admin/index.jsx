@@ -262,7 +262,7 @@ function Admin(props) {
                                                         <th>TITLE</th>
                                                         <th>DESC</th>
                                                         <th>IMG</th>
-                                                        <th>ACTION</th>
+                                                        <th width="25%">ACTION</th>
                                                     </tr>
                                                 </thead>
 
