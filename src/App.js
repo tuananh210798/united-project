@@ -9,6 +9,7 @@ import Products from './components/Products';
 import Contact from './components/Contact';
 import Hihi from './components/Hihi';
 import Admin from './components/Admin';
+import AddBook from './components/AddBook';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 
@@ -60,8 +61,11 @@ function App() {
         </Switch>
         <Route path='/admin'>
           <Admin />
-
         </Route>
+        <Route exact path='/addBook'>
+          <AddBook />
+        </Route>
+        <Route exact path="/books/:id" component={AddBook} />
       </Router>
     </div>
   );

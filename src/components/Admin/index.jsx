@@ -1,14 +1,24 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import Pagination from "@material-ui/lab/Pagination";
 import productAPI from '../../api/productAPI';
+import { Link } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 Admin.propTypes = {
 
 };
 
 function Admin(props) {
+    let history = useHistory();
+
+    const innitalBook = {
+        id: null,
+        title: "",
+        desc: "",
+        img: ""
+    };
+    const [tutorial, setTutorial] = useState(innitalBook);
 
     const imgStyle = {
         width: '70px',
@@ -52,7 +62,6 @@ function Admin(props) {
     const fetchBookList = async () => {
         try {
             const params = getRequestParams(searchTitle, page, pageSize);
-            console.log(params);
             await productAPI.getAll(params)
                 .then((response) => {
                     const bk = response;
@@ -80,7 +89,7 @@ function Admin(props) {
                 await productAPI.getAll(params)
                     .then((response) => {
                         const tt = response.length;
-                        console.log(tt);
+
                         localStorage.setItem("tt", tt);
                     })
 
@@ -98,8 +107,24 @@ function Admin(props) {
     const handlePageSizeChange = (event) => {
         setPageSize(event.target.value);
         setPage(1);
-        console.log("asdasd");
+
     };
+
+    const deleteBookByIds = () => {
+        bookList.forEach(d => {
+            if (d.select) {
+                productAPI.deleteBook(d.id)
+                    .then(response => {
+                        console.log(response);
+                        fetchBookList();
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+            }
+        });
+
+    }
 
 
 
@@ -107,7 +132,7 @@ function Admin(props) {
     return (
         <div>
             <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-                <a className="navbar-brand" href="index.html">Start Bootstrap</a>
+                <a className="navbar-brand" href="index.html">Wellcome</a>
                 <button className="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i className="fas fa-bars"></i></button>
                 {/* <!-- Navbar--> */}
                 <ul className="navbar-nav ml-auto ml-md-0">
@@ -236,7 +261,7 @@ function Admin(props) {
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn-success" style={styleAdd}>ADD</button>
+                                <Link to="/addBook"><button type="button" className="btn btn-success" style={styleAdd}>ADD</button></Link>
                             </div>
 
 
@@ -274,6 +299,13 @@ function Admin(props) {
                                                 <thead>
                                                     <tr>
                                                         <th width="10%">ID</th>
+                                                        <th>  <input type="checkbox" onChange={e => {
+                                                            let value = e.target.checked; setBookList(bookList.map(d => {
+                                                                d.select = value;
+                                                                return d;
+                                                            })
+                                                            );
+                                                        }} /></th>
                                                         <th>TITLE</th>
                                                         <th>DESC</th>
                                                         <th>IMG</th>
@@ -285,11 +317,26 @@ function Admin(props) {
                                                     {bookList.map(ad => (
                                                         <tr key={ad.id}>
                                                             <td>{ad.id}</td>
+                                                            <td>   <input
+                                                                type="checkbox"
+                                                                checked={ad.select}
+                                                                onChange={e => {
+                                                                    let value = e.target.checked;
+                                                                    setBookList(
+                                                                        bookList.map(sd => {
+                                                                            if (sd.id === ad.id) {
+                                                                                sd.select = value;
+                                                                            }
+                                                                            return sd;
+                                                                        })
+                                                                    );
+                                                                }}
+                                                            /></td>
                                                             <td>{ad.title}</td>
                                                             <td>{ad.desc}</td>
                                                             <td><img src={ad.img} style={imgStyle} /></td>
-                                                            <td> <button type="button" className="btn btn-primary">Update</button> &nbsp; &nbsp;
-                                                            <button type="button" className="btn btn-danger">Delete</button>
+                                                            <td><Link to={"/books/" + ad.id}><button type="button" className="btn btn-primary">Update</button></Link>&nbsp; &nbsp;
+
                                                             </td>
 
                                                         </tr>
@@ -298,6 +345,7 @@ function Admin(props) {
                                                 </tbody>
 
                                             </table>
+                                            <button onClick={() => { deleteBookByIds() }} type="button" className="btn btn-danger" >Delete</button>
                                             <Pagination
                                                 count={count}
                                                 page={page}
