@@ -35,11 +35,6 @@ function App() {
     fetchProductList();
   }, []);
 
-
-
-
-
-
   return (
 
     <div className="app">

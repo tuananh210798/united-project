@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import productAPI from '../../api/productAPI';
 import { useHistory } from "react-router-dom";
 
+
 AddBook.propTypes = {
 
 };
 
 function AddBook(props) {
+
 
     let history = useHistory();
 
@@ -17,7 +19,7 @@ function AddBook(props) {
         img: ""
     };
     const [tutorial, setTutorial] = useState(innitalBook);
-    const [submitted, setSubmitted] = useState(false);
+
 
     const handleInputChange = event => {
         const { name, value } = event.target;
@@ -29,7 +31,7 @@ function AddBook(props) {
         var data = {
             title: tutorial.title,
             desc: tutorial.desc,
-            img: tutorial.img
+            img: image
         };
         productAPI.addBook(data)
             .then(respone => {
@@ -37,7 +39,7 @@ function AddBook(props) {
                     id: respone.id,
                     title: respone.title,
                     desc: respone.desc,
-                    img: respone.img
+                    img: image
 
                 });
                 history.push("/admin");
@@ -53,6 +55,7 @@ function AddBook(props) {
         console.log(id);
         productAPI.get(id)
             .then(response => {
+                console.log(response);
                 setTutorial(response);
             })
             .catch(e => {
@@ -71,7 +74,7 @@ function AddBook(props) {
     const updateTutorial = () => {
         productAPI.updateBook(tutorial.id, tutorial)
             .then(response => {
-                console.log(response);
+
                 history.push("/admin");
             })
             .catch(e => {
@@ -79,6 +82,29 @@ function AddBook(props) {
             });
     };
 
+    const [image, setImage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const uploadImage = async e => {
+        const files = e.target.files
+        console.log(files);
+        const data = new FormData()
+        data.append('file', files[0])
+        data.append('upload_preset', 'ta_upload')
+        setLoading(true)
+        const res = await fetch(
+            '	https://api.cloudinary.com/v1_1/tuananhnguyen/image/upload',
+            {
+                method: 'POST',
+                body: data
+            }
+        )
+        const file = await res.json()
+        console.log('img', file.secure_url);
+        setImage(file.secure_url)
+        setLoading(false)
+
+
+    }
     return (
 
         <div>
@@ -228,7 +254,16 @@ function AddBook(props) {
                                     <label for="usr" style={{ marginLeft: "-550px", marginTop: "10px", fontWeight: "bold" }}>Desc:</label>
                                     <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "10px" }} type="text" class="form-control" id="desc" name="desc" onChange={handleInputChange} value={tutorial.desc} />
                                     <label for="usr" style={{ marginLeft: "-540px", marginTop: "10px", fontWeight: "bold" }}>Image:</label>
-                                    <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "50px" }} type="text" class="form-control" id="img" name="img" onChange={handleInputChange} value={tutorial.img} />
+                                    {/* <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "50px" }} type="text" class="form-control" id="img" name="img" onChange={handleInputChange} value={tutorial.img} /> */}
+                                    <br />
+
+                                    {loading ? (
+                                        <h3>Loading...</h3>
+                                    ) : (
+                                            image ? <img style={{ width: '300px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" onChange={handleInputChange} src={image} /> : <img style={{ width: '300px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" onChange={handleInputChange} src={tutorial.img} />
+
+                                        )}
+                                    <input style={{ marginLeft: "300px", marginBottom: "50px" }} type="file" name="file" placeholder="Upload an image" onChange={uploadImage} />
 
                                     {tutorial.id ? <button onClick={updateTutorial} type="button" style={{ width: "10%", margin: "0 auto", marginBottom: "20px" }} class="btn btn-info">Update</button> :
                                         <button onClick={saveTutorial} type="button" style={{ width: "10%", margin: "0 auto", marginBottom: "20px" }} class="btn btn-info">Save</button>}
