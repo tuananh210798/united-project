@@ -295,7 +295,7 @@ function Admin(props) {
                                                     </div>
                                                 </div>
                                             </form>
-                                            <table className="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <table className="table table-bordered" id="dataTable" width="100%" cellSpacing="0">
                                                 <thead>
                                                     <tr>
                                                         <th width="10%">ID</th>

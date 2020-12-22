@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import productAPI from '../../api/productAPI';
 import { useHistory } from "react-router-dom";
-
+import isEmpty from "validator/lib/isEmpty"
 
 AddBook.propTypes = {
 
@@ -12,6 +12,9 @@ function AddBook(props) {
 
     let history = useHistory();
 
+    const [validationMsg, setValidationMsg] = useState({})
+
+
     const innitalBook = {
         id: null,
         title: "",
@@ -21,13 +24,33 @@ function AddBook(props) {
     const [tutorial, setTutorial] = useState(innitalBook);
 
 
-    const handleInputChange = event => {
-        const { name, value } = event.target;
-        setTutorial({ ...tutorial, [name]: value });
+    const handleInputChange1 = event => {
+        setTutorial({ ...tutorial, title: event.target.value });
 
     };
+    const handleInputChange2 = event => {
+        setTutorial({ ...tutorial, desc: event.target.value });
+    };
+
+
+    const validateAll = () => {
+        const msg = {}
+        if (isEmpty(tutorial.title)) {
+            msg.title = "Please input your Email"
+        }
+        if (isEmpty(tutorial.desc)) {
+            msg.desc = "Please input your Password"
+        }
+
+        setValidationMsg(msg)
+        if (Object.keys(msg).length > 0) return false
+        return true
+    }
 
     const saveTutorial = () => {
+
+        const isValid = validateAll()
+        if (!isValid) return
         var data = {
             title: tutorial.title,
             desc: tutorial.desc,
@@ -73,8 +96,9 @@ function AddBook(props) {
 
     const updateTutorial = () => {
         productAPI.updateBook(tutorial.id, tutorial)
-            .then(response => {
 
+            .then(response => {
+                console.log('1111', tutorial);
                 history.push("/admin");
             })
             .catch(e => {
@@ -87,6 +111,7 @@ function AddBook(props) {
     const uploadImage = async e => {
         const files = e.target.files
         console.log(files);
+
         const data = new FormData()
         data.append('file', files[0])
         data.append('upload_preset', 'ta_upload')
@@ -101,6 +126,11 @@ function AddBook(props) {
         const file = await res.json()
         console.log('img', file.secure_url);
         setImage(file.secure_url)
+        setTutorial({
+            ...tutorial,
+            img: file.secure_url
+        });
+        console.log(tutorial.img)
         setLoading(false)
 
 
@@ -249,18 +279,20 @@ function AddBook(props) {
                                         <i className="fas fa-table mr-1"></i>
                                 Nhập thông tin sản phẩm
                                 </div>
-                                    <label for="usr" style={{ marginLeft: "-550px", marginTop: "10px", fontWeight: "bold" }}>Title:</label>
-                                    <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "10px", }} type="text" class="form-control" id="title" name="title" onChange={handleInputChange} value={tutorial.title} />
-                                    <label for="usr" style={{ marginLeft: "-550px", marginTop: "10px", fontWeight: "bold" }}>Desc:</label>
-                                    <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "10px" }} type="text" class="form-control" id="desc" name="desc" onChange={handleInputChange} value={tutorial.desc} />
-                                    <label for="usr" style={{ marginLeft: "-540px", marginTop: "10px", fontWeight: "bold" }}>Image:</label>
-                                    {/* <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "50px" }} type="text" class="form-control" id="img" name="img" onChange={handleInputChange} value={tutorial.img} /> */}
+                                    <label htmlFor="usr" style={{ marginLeft: "-550px", marginTop: "10px", fontWeight: "bold" }}>Title:</label>
+                                    <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "10px", }} type="text" class="htmlForm-control" id="title" name="title" onChange={handleInputChange1} value={tutorial.title} />
+                                    <p style={{ color: "red" }}>{validationMsg.title}</p>
+                                    <label htmlFor="usr" style={{ marginLeft: "-550px", marginTop: "10px", fontWeight: "bold" }}>Desc:</label>
+                                    <input required style={{ width: "50%", marginLeft: "300px", marginBottom: "10px" }} type="text" class="htmlForm-control" id="desc" name="desc" onChange={handleInputChange2} value={tutorial.desc} />
+                                    <p style={{ color: "red" }}>{validationMsg.desc}</p>
+                                    <label htmlFor="usr" style={{ marginLeft: "-540px", marginTop: "10px", fontWeight: "bold" }}>Image:</label>
+
                                     <br />
 
                                     {loading ? (
                                         <h3>Loading...</h3>
                                     ) : (
-                                            image ? <img style={{ width: '300px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" onChange={handleInputChange} src={image} /> : <img style={{ width: '300px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" onChange={handleInputChange} src={tutorial.img} />
+                                            image ? <img style={{ width: '200px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" src={image} /> : <img style={{ width: '200px', marginLeft: "450px", marginBottom: "50px" }} id="img" name="img" src={tutorial.img} value={tutorial.img} />
 
                                         )}
                                     <input style={{ marginLeft: "300px", marginBottom: "50px" }} type="file" name="file" placeholder="Upload an image" onChange={uploadImage} />
